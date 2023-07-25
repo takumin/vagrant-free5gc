@@ -1,0 +1,6 @@
+include_recipe(File.expand_path('../../cookbooks/go', __FILE__))
+include_recipe(File.expand_path('../../cookbooks/mongodb', __FILE__))
+include_recipe(File.expand_path('../../cookbooks/nodejs', __FILE__))
+include_recipe(File.expand_path('../../cookbooks/yarn', __FILE__))
+include_recipe(File.expand_path('../../cookbooks/free5gc/cplane', __FILE__))
+include_recipe(File.expand_path('../../cookbooks/free5gc/uplane', __FILE__))
