@@ -1,8 +1,8 @@
-version = '1.20.5'
+version = '1.17.13'
 
 sha256sum = Hashie::Mash.new
-sha256sum['amd64'] = 'd7ec48cde0d3d2be2c69203bc3e0a44de8660b9c09a6e85c4732a3f7dc442612'
-sha256sum['arm64'] = 'aa2fab0a7da20213ff975fa7876a66d47b48351558d98851b87d1cfef4360d09'
+sha256sum['amd64'] = '4cdd2bc664724dc7db94ad51b503512c5ae7220951cac568120f64f8e94399fc'
+sha256sum['arm64'] = '914daad3f011cc2014dea799bb7490442677e4ad6de0b2ac3ded6cee7e3f493d'
 
 case node[:kernel][:machine]
 when 'x86_64'
