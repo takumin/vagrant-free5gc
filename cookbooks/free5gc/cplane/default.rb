@@ -1,3 +1,6 @@
+# テスト実行したい場合はtrueにする
+testing = false
+
 package 'git'
 package 'build-essential'
 package 'cmake'
@@ -13,7 +16,8 @@ directory '/opt/free5gc' do
   mode '0755'
 end
 
-execute 'git clone --recursive -b v3.3.0 -j $(nproc) https://github.com/free5gc/free5gc.git /opt/free5gc' do
+execute 'git clone free5gc' do
+  command 'git clone --recursive -b v3.3.0 -j $(nproc) https://github.com/free5gc/free5gc.git /opt/free5gc'
   not_if 'test -e /opt/free5gc/Makefile'
   user 'vagrant'
 end
@@ -55,4 +59,31 @@ package 'psmisc'
 
 link '/bin/go'  do
   to '/usr/local/go/bin/go'
+end
+
+# Testing
+
+if testing
+  [
+    'TestRegistration',
+    'TestGUTIRegistration',
+    'TestServiceRequest',
+    'TestXnHandover',
+    'TestN2Handover',
+    'TestDeregistration',
+    'TestPDUSessionReleaseRequest',
+    'TestPaging',
+    'TestNon3GPP',
+    'TestReSynchronization',
+    'TestDuplicateRegistration',
+    'TestEAPAKAPrimeAuthentication',
+  ].each do |arg|
+    execute "./test.sh #{arg}" do
+      cwd '/opt/free5gc'
+      user 'vagrant'
+
+      action :nothing
+      subscribes :run, 'execute[git clone free5gc]'
+    end
+  end
 end
