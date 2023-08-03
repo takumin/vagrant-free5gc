@@ -103,6 +103,9 @@ Vagrant.configure('2') do |config|
       # Ubuntu 20.04 Focal Fossa
       domain.vm.box = 'generic/ubuntu2004'
 
+      # WebConsole Port Forwarding
+      domain.vm.network 'forwarded_port', guest: 5000, host: 5000 if role == :cplane
+
       # MItamae Install
       domain.vm.provision 'shell' do |shell|
         shell.name   = 'Install mitamae'
