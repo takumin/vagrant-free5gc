@@ -1,4 +1,5 @@
 ---
+role: cplane
 free5gc:
   amf:        true
   ausf:       true

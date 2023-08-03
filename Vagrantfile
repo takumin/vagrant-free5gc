@@ -10,6 +10,7 @@ MITAMAE_ROLES = [
   :cplane,
   # :uplane,
   # :webconsole,
+  :ueransim,
 ]
 
 # Download Require Binary
