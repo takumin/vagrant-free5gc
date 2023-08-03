@@ -1,6 +1,3 @@
-# テスト実行したい場合はtrueにする
-testing = false
-
 package 'git'
 package 'build-essential'
 package 'cmake'
@@ -68,6 +65,8 @@ link '/bin/go'  do
 end
 
 # Testing
+
+testing = false
 
 if testing
   [
