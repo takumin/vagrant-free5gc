@@ -37,6 +37,12 @@ execute 'env PATH=/usr/local/go/bin:$PATH make -j $(nproc)' do
   user 'vagrant'
 end
 
+execute 'env PATH=/usr/local/go/bin:$PATH make -j $(nproc) webconsole' do
+  cwd '/opt/free5gc'
+  not_if 'test -e /opt/free5gc/webconsole/bin/webconsole'
+  user 'vagrant'
+end
+
 # Network Settings
 
 execute 'sysctl -w net.ipv4.ip_forward=1' do
