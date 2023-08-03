@@ -127,7 +127,7 @@ Vagrant.configure('2') do |config|
         }
         shell.inline = <<~BASH
           cd /.vagrant
-          mitamae local roles/#{role}.rb
+          mitamae local -y nodes/#{role}.yml roles/#{role}.rb
         BASH
       end
     end

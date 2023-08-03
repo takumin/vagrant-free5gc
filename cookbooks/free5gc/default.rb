@@ -1,3 +1,54 @@
+NETWORK_FUNCTIONS = [
+  :amf,
+  :ausf,
+  :n3iwf,
+  :nrf,
+  :nssf,
+  :pcf,
+  :smf,
+  :udm,
+  :udr,
+  :upf,
+]
+
+node.reverse_merge!({
+  free5gc: {
+    version:    'v3.3.0',
+    amf:        true,
+    ausf:       true,
+    n3iwf:      true,
+    nrf:        true,
+    nssf:       true,
+    pcf:        true,
+    smf:        true,
+    udm:        true,
+    udr:        true,
+    upf:        true,
+    webconsole: false,
+    test:       false,
+  },
+})
+
+node.validate! do
+  {
+    free5gc: {
+      version:    string,
+      amf:        optional(boolean),
+      ausf:       optional(boolean),
+      n3iwf:      optional(boolean),
+      nrf:        optional(boolean),
+      nssf:       optional(boolean),
+      pcf:        optional(boolean),
+      smf:        optional(boolean),
+      udm:        optional(boolean),
+      udr:        optional(boolean),
+      upf:        optional(boolean),
+      webconsole: optional(boolean),
+      test:       optional(boolean),
+    }
+  }
+end
+
 package 'git'
 package 'build-essential'
 package 'cmake'
@@ -7,6 +58,9 @@ package 'pkg-config'
 package 'libmnl-dev'
 package 'libyaml-dev'
 
+# required test scripts
+package 'psmisc'
+
 directory '/opt/free5gc' do
   owner 'vagrant'
   group 'vagrant'
@@ -14,30 +68,25 @@ directory '/opt/free5gc' do
 end
 
 execute 'git clone free5gc' do
-  command 'git clone --recursive -b v3.3.0 -j $(nproc) https://github.com/free5gc/free5gc.git /opt/free5gc'
+  command "git clone --recursive -b #{node.free5gc.version} -j $(nproc) https://github.com/free5gc/free5gc.git /opt/free5gc"
   not_if 'test -e /opt/free5gc/Makefile'
   user 'vagrant'
 end
 
-execute 'env PATH=/usr/local/go/bin:$PATH make -j $(nproc)' do
-  cwd '/opt/free5gc'
-  not_if 'test -e /opt/free5gc/bin/amf'
-  not_if 'test -e /opt/free5gc/bin/ausf'
-  not_if 'test -e /opt/free5gc/bin/n3iwf'
-  not_if 'test -e /opt/free5gc/bin/nrf'
-  not_if 'test -e /opt/free5gc/bin/nssf'
-  not_if 'test -e /opt/free5gc/bin/pcf'
-  not_if 'test -e /opt/free5gc/bin/smf'
-  not_if 'test -e /opt/free5gc/bin/udm'
-  not_if 'test -e /opt/free5gc/bin/udr'
-  not_if 'test -e /opt/free5gc/bin/upf'
-  user 'vagrant'
+node.free5gc.keys.select{|nf|NETWORK_FUNCTIONS.include?(nf.to_sym)}.each do |nf|
+  execute "env PATH=/usr/local/go/bin:$PATH make -j $(nproc) #{nf}" do
+    cwd '/opt/free5gc'
+    not_if "test -e /opt/free5gc/bin/#{nf}"
+    user 'vagrant'
+  end
 end
 
-execute 'env PATH=/usr/local/go/bin:$PATH make -j $(nproc) webconsole' do
-  cwd '/opt/free5gc'
-  not_if 'test -e /opt/free5gc/webconsole/bin/webconsole'
-  user 'vagrant'
+if node.free5gc.webconsole
+  execute 'env PATH=/usr/local/go/bin:$PATH make -j $(nproc) webconsole' do
+    cwd '/opt/free5gc'
+    not_if 'test -e /opt/free5gc/webconsole/bin/webconsole'
+    user 'vagrant'
+  end
 end
 
 # Network Settings
@@ -56,19 +105,9 @@ execute 'iptables -A FORWARD -p tcp -m tcp --tcp-flags SYN,RST SYN -j TCPMSS --s
   subscribes :run, 'execute[sysctl -w net.ipv4.ip_forward=1]', :immediately
 end
 
-# Required Test Script
-
-package 'psmisc'
-
-link '/bin/go'  do
-  to '/usr/local/go/bin/go'
-end
-
 # Testing
 
-testing = false
-
-if testing
+if node.free5gc.test
   [
     'TestRegistration',
     'TestGUTIRegistration',

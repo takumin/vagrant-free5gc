@@ -1,0 +1,13 @@
+---
+free5gc:
+  amf:        true
+  ausf:       true
+  n3iwf:      true
+  nrf:        true
+  nssf:       true
+  pcf:        true
+  smf:        true
+  udm:        true
+  udr:        true
+  upf:        true
+  webconsole: true

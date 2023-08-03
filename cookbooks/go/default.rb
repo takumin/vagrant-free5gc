@@ -69,3 +69,8 @@ file '/etc/sudoers' do
     end
   end
 end
+
+# required free5gc test scripts
+link '/bin/go'  do
+  to '/usr/local/go/bin/go'
+end
