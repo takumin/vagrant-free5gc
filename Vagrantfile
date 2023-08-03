@@ -99,8 +99,8 @@ Vagrant.configure('2') do |config|
       # Hostname
       domain.vm.hostname = "#{role}.vagrant.internal"
 
-      # Debian 12 Bookworm
-      domain.vm.box = 'debian/bullseye64'
+      # Ubuntu 20.04 Focal Fossa
+      domain.vm.box = 'generic/ubuntu2004'
 
       # MItamae Install
       domain.vm.provision 'shell' do |shell|
