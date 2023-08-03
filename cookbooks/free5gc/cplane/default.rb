@@ -7,10 +7,15 @@ package 'pkg-config'
 package 'libmnl-dev'
 package 'libyaml-dev'
 
-git '/opt/free5gc' do
-  repository 'https://github.com/free5gc/free5gc.git'
-  revision 'v3.3.0'
-  recursive true
+directory '/opt/free5gc' do
+  owner 'vagrant'
+  group 'vagrant'
+  mode '0755'
+end
+
+execute 'git clone --recursive -b v3.3.0 -j $(nproc) https://github.com/free5gc/free5gc.git /opt/free5gc' do
+  not_if 'test -e /opt/free5gc/Makefile'
+  user 'vagrant'
 end
 
 execute 'env PATH=/usr/local/go/bin:$PATH make -j $(nproc)' do
@@ -25,6 +30,23 @@ execute 'env PATH=/usr/local/go/bin:$PATH make -j $(nproc)' do
   not_if 'test -e /opt/free5gc/bin/udm'
   not_if 'test -e /opt/free5gc/bin/udr'
   not_if 'test -e /opt/free5gc/bin/upf'
+  user 'vagrant'
+end
+
+# Network Settings
+
+execute 'sysctl -w net.ipv4.ip_forward=1' do
+  only_if 'test $(sysctl -n net.ipv4.ip_forward) = 0'
+end
+
+execute 'iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE' do
+  action :nothing
+  subscribes :run, 'execute[sysctl -w net.ipv4.ip_forward=1]', :immediately
+end
+
+execute 'iptables -A FORWARD -p tcp -m tcp --tcp-flags SYN,RST SYN -j TCPMSS --set-mss 1400' do
+  action :nothing
+  subscribes :run, 'execute[sysctl -w net.ipv4.ip_forward=1]', :immediately
 end
 
 # Required Test Script
